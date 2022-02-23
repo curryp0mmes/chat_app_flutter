@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 class StorageRepo {
   static FirebaseStorage storage = FirebaseStorage.instance;
 
-
+  //Upload a file to Firebase and get the DownloadURL
   static Future<String> uploadFile({
     required File file,
     String? subfolder

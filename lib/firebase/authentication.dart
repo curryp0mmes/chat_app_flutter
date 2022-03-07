@@ -45,7 +45,9 @@ class AuthenticationTools {
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided for that user.');
       }
-      else print(e.code);
+      else {
+        print(e.code);
+      }
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:chat_app/firebase/authentication.dart';
 import 'package:chat_app/general_decorations.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {

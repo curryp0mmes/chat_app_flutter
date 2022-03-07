@@ -39,6 +39,7 @@ dependencies:
   firebase_messaging: ^11.2.6
   file_picker: ^4.4.0
   firebase_storage: ^10.2.7
+  firebase_database: ^9.0.6
 
 dev_dependencies:
   flutter_test:

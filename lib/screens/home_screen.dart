@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:chat_app/firebase/authentication.dart';
 import 'package:chat_app/firebase/storage_repo.dart';
+import 'package:chat_app/screens/chat_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({Key? key}) : super(key: key);
@@ -29,6 +31,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     return Scaffold (
       appBar: AppBar(
         title: const Text("ChatApp"),
+        elevation: 0,
         actions: [
           PopupMenuButton(itemBuilder: (context) => [
             PopupMenuItem(child: const Text("Logout"), onTap: () {
@@ -39,6 +42,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
             ,)
           ])
         ],
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.light),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
@@ -56,43 +60,48 @@ class _HomePageScreenState extends State<HomePageScreen> {
         },
         currentIndex: _selectedScreen,
       ),
-      body: Column(
-        children: [
-          Text('Logged in as ${currentUser?.email}'),
-          Image.network(currentUser?.photoURL ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png', width: 100, height: 100,),
-          TextButton(onPressed: () async {
-            FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
-            if (result != null) {
-              String path = result.files.single.path.toString();
-              File file = File(path);
+      body: Padding(
+        padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+        child: Column(
+          children: [
+            Text('Logged in as ${currentUser?.email}'),
+            Image.network(currentUser?.photoURL ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png', width: 100, height: 100,),
+            TextButton(onPressed: () async {
+              FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
+              if (result != null) {
+                String path = result.files.single.path.toString();
+                File file = File(path);
 
-              //TODO upload to Firebase Storage and set profile photourl
-              var newURL = await StorageRepo.uploadFile(file: file, subfolder: 'profile');
-              setState(() {
-                currentUser?.updatePhotoURL(newURL);
-              });
-            }
-          }, child: Text('Change Picture')),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    'You have pushed the button this many times:',
-                  ),
-                  Text(
-                    '$_counter',
-                    style: Theme.of(context).textTheme.headline4,
-                  ),
-                ],
+                //TODO upload to Firebase Storage and set profile photoUrl
+                var newURL = await StorageRepo.uploadFile(file: file, subfolder: 'profile');
+                setState(() {
+                  currentUser?.updatePhotoURL(newURL);
+                });
+              }
+            }, child: const Text('Change Picture')),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const Text(
+                      'You have pushed the button this many times:',
+                    ),
+                    Text(
+                      '$_counter',
+                      style: Theme.of(context).textTheme.headline4,
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatWindow()));
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),

@@ -11,6 +11,9 @@ class ChatWindow extends StatefulWidget {
 }
 
 class _ChatWindowState extends State<ChatWindow> {
+
+  final _messages = {"test", "hallo", "abc", "hallowelt", "abc1", "hallowelt2", "abc3", "hallowelt4", "abc5", "hallowelt6", "abc7", "Dies ist eine sehr lange Nachricht, damit man auch mal sieht was damit passiert. Hier sind alle Nachkommastellen von PI die ich kenne: 3,14159265358979323846", "abc9", "hallowelt00", "abc11", "hallowelt22"};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,21 +33,15 @@ class _ChatWindowState extends State<ChatWindow> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: const [
-                  ChatblobWidget(message: "TestMessage1eahkjsdhkjsakjdhasjkhdjkasjkdh", right: false,),
-                  Padding(padding: EdgeInsets.all(2)),
-                  ChatblobWidget(message: "TestMessage2",),
-                  Padding(padding: EdgeInsets.all(2)),
-                  ChatblobWidget(message: "TestMessage3",),
-                  Padding(padding: EdgeInsets.all(2)),
-                  ChatblobWidget(message: "TestMessage4", right: false,),
-                  Padding(padding: EdgeInsets.all(2)),
-                  ChatblobWidget(message: "TestMessage5",),
-                  Padding(padding: EdgeInsets.all(2)),
-                  ChatblobWidget(message: "TestMessage6",),
-                ],
+              child: ListView.builder(
+                reverse: true,
+                  itemCount: _messages.length * 2,
+                  itemBuilder: (context, index) {
+                    if(index.isOdd) return Padding(padding: EdgeInsets.only(top: 8));
+
+                    final trueIndex = _messages.length - 1 - (index ~/ 2);
+                    return ChatblobWidget(message: _messages.elementAt(trueIndex), timestamp: trueIndex.toString()+":07", right: (trueIndex % 3) != 0,); //TODO fix right check and timestamp
+                  }
               ),
             ),
           ),

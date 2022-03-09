@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({Key? key}) : super(key: key);
@@ -70,31 +71,17 @@ class _HomePageScreenState extends State<HomePageScreen> {
               FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
               if (result != null) {
                 String path = result.files.single.path.toString();
-                File file = File(path);
+                
+                var file = await ImageCropper().cropImage(sourcePath: path, compressQuality: 40, aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1)); //TODO fix deprecated
 
                 //TODO upload to Firebase Storage and set profile photoUrl
-                var newURL = await StorageRepo.uploadFile(file: file, subfolder: 'profile');
+                var newURL = await StorageRepo.uploadFile(file: file!, subfolder: 'profile');
                 setState(() {
                   currentUser?.updatePhotoURL(newURL);
                 });
               }
             }, child: const Text('Change Picture')),
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const Text(
-                      'You have pushed the button this many times:',
-                    ),
-                    Text(
-                      '$_counter',
-                      style: Theme.of(context).textTheme.headline4,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
           ],
         ),
       ),
@@ -103,7 +90,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatWindow()));
         },
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.message),
       ),
     );
   }

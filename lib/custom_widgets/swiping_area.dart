@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:chat_app/constants.dart';
-import 'package:chat_app/custom_widgets/draggable_card.dart';
-import 'package:chat_app/firebase/authentication.dart';
-import 'package:chat_app/firebase/database.dart';
+import 'package:mkship_app/constants.dart';
+import 'package:mkship_app/custom_widgets/draggable_card.dart';
+import 'package:mkship_app/firebase/authentication.dart';
+import 'package:mkship_app/firebase/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

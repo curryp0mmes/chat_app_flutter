@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:chat_app/constants.dart';
-import 'package:chat_app/custom_widgets/swiping_area.dart';
-import 'package:chat_app/firebase/authentication.dart';
-import 'package:chat_app/firebase/database.dart';
-import 'package:chat_app/firebase/storage_repo.dart';
-import 'package:chat_app/screens/chat_screen.dart';
-import 'package:chat_app/screens/chats_list.dart';
-import 'package:chat_app/screens/profile_screen.dart';
+import 'package:mkship_app/constants.dart';
+import 'package:mkship_app/custom_widgets/swiping_area.dart';
+import 'package:mkship_app/firebase/authentication.dart';
+import 'package:mkship_app/firebase/database.dart';
+import 'package:mkship_app/firebase/storage_repo.dart';
+import 'package:mkship_app/screens/chat_screen.dart';
+import 'package:mkship_app/screens/chats_list.dart';
+import 'package:mkship_app/screens/profile_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

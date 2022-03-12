@@ -1,4 +1,4 @@
-import 'package:chat_app/screens/chat_screen.dart';
+import 'package:mkship_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class ChatList extends StatefulWidget {

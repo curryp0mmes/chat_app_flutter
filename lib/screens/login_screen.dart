@@ -1,5 +1,5 @@
-import 'package:chat_app/firebase/authentication.dart';
-import 'package:chat_app/constants.dart';
+import 'package:mkship_app/firebase/authentication.dart';
+import 'package:mkship_app/constants.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {

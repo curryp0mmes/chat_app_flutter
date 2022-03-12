@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chat_app/firebase/authentication.dart';
+import 'package:mkship_app/firebase/authentication.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class StorageRepo {

@@ -1,5 +1,5 @@
-import 'package:chat_app/constants.dart';
-import 'package:chat_app/firebase/database.dart';
+import 'package:mkship_app/constants.dart';
+import 'package:mkship_app/firebase/database.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

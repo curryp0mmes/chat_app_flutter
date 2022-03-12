@@ -1,4 +1,4 @@
-package de.mkship.chat_app
+package de.mkship.mkship_app
 
 import io.flutter.embedding.android.FlutterActivity
 

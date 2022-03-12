@@ -1,5 +1,5 @@
-import 'package:chat_app/app_theme.dart';
-import 'package:chat_app/custom_widgets/chatblob.dart';
+import 'package:mkship_app/app_theme.dart';
+import 'package:mkship_app/custom_widgets/chatblob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

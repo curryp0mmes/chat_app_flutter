@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:chat_app/custom_widgets/swiping_area.dart';
 import 'package:chat_app/firebase/authentication.dart';
+import 'package:chat_app/firebase/database.dart';
 import 'package:chat_app/firebase/storage_repo.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:file_picker/file_picker.dart';
@@ -17,22 +19,20 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
-  int _counter = 0;
   int _selectedScreen = 0;
-  User? currentUser = AuthenticationTools.getUser();
+  static final User? _currentCredentials = AuthenticationTools.getUser();
+  final UserData? _currentUser = DatabaseHandler.currentUser;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold (
       appBar: AppBar(
-        title: const Text("ChatApp"),
+        title: const Text("mk:ship"),
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
         elevation: 0,
+
         actions: [
           PopupMenuButton(itemBuilder: (context) => [
             PopupMenuItem(child: const Text("Logout"), onTap: () {
@@ -43,18 +43,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
             ,)
           ])
         ],
-        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.light),
+        systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chats"),
         ],
         onTap: (index){
           setState(() {
             if(index == 1) {
               showSearch(context: context, delegate: CustomSearchDelegate(),);
-            } else {
+            } else if(index == 2) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatWindow()));
+            } else{
               _selectedScreen = index;
             }
           });
@@ -64,9 +67,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
       body: Padding(
         padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Logged in as ${currentUser?.email}'),
-            Image.network(currentUser?.photoURL ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png', width: 100, height: 100,),
+            const SwipingArea(),
+            const Padding(padding: EdgeInsets.all(30)),
+            Text('Logged in as ${_currentUser?.email}'),
+            Image.network(_currentUser?.photoURL ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png', width: 100, height: 100,),
             TextButton(onPressed: () async {
               FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
               if (result != null) {
@@ -77,20 +83,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
                 //TODO upload to Firebase Storage and set profile photoUrl
                 var newURL = await StorageRepo.uploadFile(file: file!, subfolder: 'profile');
                 setState(() {
-                  currentUser?.updatePhotoURL(newURL);
+                  _currentUser?.updatePhotoURL(newURL);
                 });
               }
             }, child: const Text('Change Picture')),
 
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatWindow()));
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.message),
       ),
     );
   }

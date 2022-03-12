@@ -44,7 +44,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "de.curry.chat_app"
-        minSdkVersion 19 //manual increase
+        minSdkVersion 21 //manual increase
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

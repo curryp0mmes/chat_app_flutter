@@ -1,5 +1,6 @@
 import 'package:chat_app/app_theme.dart';
 import 'package:chat_app/firebase/authentication.dart';
+import 'package:chat_app/firebase/database.dart';
 import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   AuthenticationTools.setupAuth();
+  DatabaseHandler.setupDatabase();
   runApp(const ChatApp());
 }
 

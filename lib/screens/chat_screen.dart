@@ -20,9 +20,9 @@ class _ChatWindowState extends State<ChatWindow> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        foregroundColor: Colors.black,
         centerTitle: true,
         title: const Text("Chats",style: TextStyle(color: Colors.black)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.black), onPressed: () {Navigator.pop(context);},),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.search, color: Colors.black,))
         ],

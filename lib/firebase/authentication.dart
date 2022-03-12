@@ -1,3 +1,4 @@
+import 'package:chat_app/firebase/database.dart';
 import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/login_screen.dart';
 import 'package:chat_app/main.dart';
@@ -9,6 +10,7 @@ class AuthenticationTools {
     FirebaseAuth auth = FirebaseAuth.instance;
 
     auth.userChanges().listen((User? user) {
+      DatabaseHandler.currentUser = null;
       if (user == null) {
         print('User is currently signed out!');
         BuildContext? context = navigatorKey.currentContext;

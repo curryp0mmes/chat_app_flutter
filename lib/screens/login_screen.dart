@@ -1,5 +1,5 @@
 import 'package:chat_app/firebase/authentication.dart';
-import 'package:chat_app/general_decorations.dart';
+import 'package:chat_app/constants.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,42 +28,51 @@ class _LoginScreenState extends State<LoginScreen> {
           )
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0, top: 16.0),
-            child: TextField(decoration: CommonDecorations.getLoginFormInputDecoration(labelText: "E-Mail"), controller: _emailController,),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(decoration: CommonDecorations.getLoginFormInputDecoration(labelText: "Password"), controller: _passwordController, obscureText: true),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      AuthenticationTools.signIn(_emailController.text, _passwordController.text);
-                    });
-                  },
-                  child: const Text("Login")
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.1)),
+            Image(image: AssetImage('assets/mkship-logo.png'), width: MediaQuery.of(context).size.width * 0.5),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0, top: 16.0),
+              child: TextField(decoration: Constants.getLoginFormInputDecoration(labelText: "E-Mail"), controller: _emailController,),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(decoration: Constants.getLoginFormInputDecoration(labelText: "Password"), controller: _passwordController, obscureText: true),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          AuthenticationTools.signIn(_emailController.text, _passwordController.text);
+                        });
+                      },
+                      child: const Text("Login")
+                    ),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      AuthenticationTools.register(_emailController.text, _passwordController.text);
-                    });
-                  },
-                  child: const Text("Sign Up"),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          AuthenticationTools.register(_emailController.text, _passwordController.text);
+                        });
+                      },
+                      child: const Text("Sign Up"),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          )
-        ],
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

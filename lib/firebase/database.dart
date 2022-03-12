@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:chat_app/firebase/authentication.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,19 @@ class DatabaseHandler {
     return UserData(uid: uid ?? "anon", email: email, displayName: displayName, photoURL: photoURL);
   }
 
-  static void updateValue({required String uid, required String path, required value}) {
+  static Future<UserData> getRandomUser({List<String>? excludedUIDs}) async {
+    var users = firestore.collection("users");
+    QuerySnapshot collection = await users.get();
+    QueryDocumentSnapshot user;
+    do {
+      //TODO gotta fix that awful query
+      var index = Random().nextInt(collection.docs.length);
+      user = collection.docs[index];
+    } while (excludedUIDs != null && excludedUIDs.contains(user.id));
+    return await getUserData(uid: user.id);
+  }
+
+  static void updateUserValue({required String uid, required String path, required value}) {
     var userCollection = firestore.collection("users");
     var document = userCollection.doc(uid);
     document.update({path: value});
@@ -71,9 +85,13 @@ class UserData {
   UserData({required this.uid, this.photoURL, this.email, this.bio, this.displayName});
 
   String updatePhotoURL(String newURL) {
-    print("update");
-    DatabaseHandler.updateValue(uid: uid, path: "photoURL", value: newURL);
+    DatabaseHandler.updateUserValue(uid: uid, path: "photoURL", value: newURL);
     photoURL = newURL;
     return newURL;
+  }
+  String updateDisplayName(String newName) {
+    DatabaseHandler.updateUserValue(uid: uid, path: "displayName", value: newName);
+    displayName = newName;
+    return newName;
   }
 }

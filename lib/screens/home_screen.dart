@@ -1,16 +1,20 @@
 import 'dart:io';
 
+import 'package:chat_app/constants.dart';
 import 'package:chat_app/custom_widgets/swiping_area.dart';
 import 'package:chat_app/firebase/authentication.dart';
 import 'package:chat_app/firebase/database.dart';
 import 'package:chat_app/firebase/storage_repo.dart';
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:chat_app/screens/chats_list.dart';
+import 'package:chat_app/screens/profile_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
+
+import '../main.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({Key? key}) : super(key: key);
@@ -21,12 +25,12 @@ class HomePageScreen extends StatefulWidget {
 
 class _HomePageScreenState extends State<HomePageScreen> {
   int _selectedScreen = 0;
-  static final User? _currentCredentials = AuthenticationTools.getUser();
-  static final UserData? _currentUser = DatabaseHandler.currentUser;
+
 
 
   @override
   Widget build(BuildContext context) {
+    final UserData? _currentUser = DatabaseHandler.currentUser;
     return Scaffold (
       appBar: AppBar(
         title: const Text("mk:ship"),
@@ -36,13 +40,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
         actions: [
           PopupMenuButton(itemBuilder: (context) => [
+            PopupMenuItem(child: const Text("Profile"), onTap: () => Future(
+                  () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => ProfileScreen()),
+              ),
+            )
+            ),
             PopupMenuItem(child: const Text("Logout"), onTap: () {
               setState(() {
                 AuthenticationTools.logout();
               });
               }
-            ,)
-          ])
+            ),
+          ],
+            icon: ClipOval(child: FadeInImage.assetNetwork(placeholder: Constants.emptyProfilePicAsset, image: _currentUser?.photoURL ?? Constants.emptyProfilePic),),
+          )
         ],
         systemOverlayStyle: const SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark),
       ),
@@ -63,30 +75,12 @@ class _HomePageScreenState extends State<HomePageScreen> {
         },
         currentIndex: _selectedScreen,
       ),
-      body: _selectedScreen == 2 ? ChatList() : Padding(
+      body: _selectedScreen == 2 ? const ChatList() : Padding(
         padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SwipingArea(),
-            const Padding(padding: EdgeInsets.all(30)),
-            Text('Logged in as ${_currentUser?.email}'),
-            Image.network(_currentUser?.photoURL ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png', width: 100, height: 100,),
-            TextButton(onPressed: () async {
-              FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
-              if (result != null) {
-                String path = result.files.single.path.toString();
-
-                var file = await ImageCropper().cropImage(sourcePath: path, compressQuality: 40, aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1)); //TODO fix deprecated
-
-                //TODO upload to Firebase Storage and set profile photoUrl
-                var newURL = await StorageRepo.uploadFile(file: file!, subfolder: 'profile');
-                setState(() {
-                  _currentUser?.updatePhotoURL(newURL);
-                });
-              }
-            }, child: const Text('Change Picture')),
-
           ],
         ),
       ),

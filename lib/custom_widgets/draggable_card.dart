@@ -19,7 +19,7 @@ class DraggableCard extends StatefulWidget {
 class CardData {
   String? name;
   int? age;
-  var picture;
+  ImageProvider<Object> picture;
   CardData({required this.picture, this.name, this.age});
 }
 
@@ -45,7 +45,7 @@ class _DraggableCardState extends State<DraggableCard> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(data.name == null ? "" : data.name! + ", ", style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
+              Text(data.name == null ? "" : data.name! + (data.age == null ? "" : ", "), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
               Text(data.age == null ? "" : data.age.toString(), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
             ],
           )

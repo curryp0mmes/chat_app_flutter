@@ -13,8 +13,8 @@ class SwipingArea extends StatefulWidget {
 
 class _SwipingAreaState extends State<SwipingArea> {
 
-  List<CardData> dummypeople = [
-    CardData(picture: const AssetImage('assets/profile1.jpg'), age: 19, name: "Adame"),
+  List<CardData> dummyDataPeople = [
+    CardData(picture: const AssetImage('assets/profile1.jpg'), age: 19, name: "Angela"),
     CardData(picture: const AssetImage('assets/profile2.jpg'), age: 21, name: "Jonas"),
     CardData(picture: const AssetImage('assets/profile3.jpg'), age: 36, name: "April"),
     CardData(picture: const AssetImage('assets/profile4.jpg'), age: 20, name: "John"),
@@ -28,12 +28,14 @@ class _SwipingAreaState extends State<SwipingArea> {
 
     return SizedBox(height:  _deviceWidth, width: _deviceWidth,
       child: DraggableCard(
-          personData: dummypeople[_peopleIndex % dummypeople.length],
-          nextPersonData: dummypeople[(_peopleIndex + 1) % dummypeople.length],
+          personData: dummyDataPeople[_peopleIndex % dummyDataPeople.length],
+          nextPersonData: dummyDataPeople[(_peopleIndex + 1) % dummyDataPeople.length],
           onLike: () {setState(() {
+            print("Like");
             _peopleIndex+=1;
           });},
           onDislike: () {setState(() {
+            print("Dislike");
             _peopleIndex+=1;
           });}
       ),

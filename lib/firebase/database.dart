@@ -10,30 +10,39 @@ class DatabaseHandler {
   static Future<UserData> getUserData({required String? uid}) async {
     var userData = await firestore.collection("users").doc(uid ?? "anon").get();
 
-    return UserData(uid: uid ?? "anon", email: userData.get("email"));
+    var email = userData.get("email");
+    var displayName = userData.get("displayName");
+    var photoURL = userData.get("photoURL");
+
+
+    return UserData(uid: uid ?? "anon", email: email, displayName: displayName, photoURL: photoURL);
   }
 
   static void updateValue({required String uid, required String path, required value}) {
     var userCollection = firestore.collection("users");
-
-    userCollection.doc(uid)
-        .update({path: value});
+    var document = userCollection.doc(uid);
+    document.update({path: value});
   }
 
-  static void createUser({required String uid}) {
+  static void createUser({required String uid, required String email}) {
     var userCollection = firestore.collection("users");
 
     userCollection.doc(uid)
-        .set({'displayName': 'ABC', 'age': 20});
+        .set({'displayName': null, 'email': email, 'photoURL': null});
   }
 
-  static void setupDatabase() async {
+  static Future<void> setupDatabase() async {
     if(AuthenticationTools.isSignedIn()) {
       String uid = AuthenticationTools.getUser()?.uid ?? "anon";
+      String email = AuthenticationTools.getUser()?.email ?? "no email given";
       if(!(await _userExists(uid))) {
-        createUser(uid: uid);
+        createUser(uid: uid, email: email);
       }
       currentUser = await getUserData(uid: uid);
+      return;
+    }
+    else {
+      currentUser = null;
     }
   }
 
@@ -62,7 +71,9 @@ class UserData {
   UserData({required this.uid, this.photoURL, this.email, this.bio, this.displayName});
 
   String updatePhotoURL(String newURL) {
+    print("update");
     DatabaseHandler.updateValue(uid: uid, path: "photoURL", value: newURL);
+    photoURL = newURL;
     return newURL;
   }
 }

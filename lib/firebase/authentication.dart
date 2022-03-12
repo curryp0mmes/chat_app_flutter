@@ -9,8 +9,8 @@ class AuthenticationTools {
   static void setupAuth() {
     FirebaseAuth auth = FirebaseAuth.instance;
 
-    auth.userChanges().listen((User? user) {
-      DatabaseHandler.currentUser = null;
+    auth.userChanges().listen((User? user) async {
+      await DatabaseHandler.setupDatabase();
       if (user == null) {
         print('User is currently signed out!');
         BuildContext? context = navigatorKey.currentContext;

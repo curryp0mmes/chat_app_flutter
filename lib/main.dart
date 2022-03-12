@@ -20,7 +20,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   AuthenticationTools.setupAuth();
-  DatabaseHandler.setupDatabase();
+  await DatabaseHandler.setupDatabase();
   runApp(const ChatApp());
 }
 

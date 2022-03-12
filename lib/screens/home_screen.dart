@@ -5,6 +5,7 @@ import 'package:chat_app/firebase/authentication.dart';
 import 'package:chat_app/firebase/database.dart';
 import 'package:chat_app/firebase/storage_repo.dart';
 import 'package:chat_app/screens/chat_screen.dart';
+import 'package:chat_app/screens/chats_list.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,7 @@ class HomePageScreen extends StatefulWidget {
 class _HomePageScreenState extends State<HomePageScreen> {
   int _selectedScreen = 0;
   static final User? _currentCredentials = AuthenticationTools.getUser();
-  final UserData? _currentUser = DatabaseHandler.currentUser;
+  static final UserData? _currentUser = DatabaseHandler.currentUser;
 
 
   @override
@@ -55,8 +56,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
           setState(() {
             if(index == 1) {
               showSearch(context: context, delegate: CustomSearchDelegate(),);
-            } else if(index == 2) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatWindow()));
             } else{
               _selectedScreen = index;
             }
@@ -64,7 +63,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         },
         currentIndex: _selectedScreen,
       ),
-      body: Padding(
+      body: _selectedScreen == 2 ? ChatList() : Padding(
         padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,7 +76,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
               FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image, allowMultiple: false);
               if (result != null) {
                 String path = result.files.single.path.toString();
-                
+
                 var file = await ImageCropper().cropImage(sourcePath: path, compressQuality: 40, aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1)); //TODO fix deprecated
 
                 //TODO upload to Firebase Storage and set profile photoUrl

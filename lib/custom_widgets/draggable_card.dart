@@ -63,7 +63,7 @@ class _DraggableCardState extends State<DraggableCard> {
   @override
   Widget build(BuildContext context) {
     var _deviceWidth = MediaQuery.of(context).size.width;
-    var likeThreshhold = 0.15;
+    var likeThreshhold = 0.10;
 
     return Draggable(
       onDragUpdate: (data) {
@@ -73,7 +73,6 @@ class _DraggableCardState extends State<DraggableCard> {
       },
       onDragEnd: (data) {
         if(_rotationStream.value > likeThreshhold) {
-          print("Like");
           widget.onLike();
         } else if(_rotationStream.value < -likeThreshhold) {
           widget.onDislike();

@@ -17,7 +17,7 @@ class SwipingArea extends StatefulWidget {
 
 class _SwipingAreaState extends State<SwipingArea> {
 
-  List<CardData> peopleDataList = [CardData(picture: FadeInImage.assetNetwork(placeholder: Constants.emptyProfilePicAsset, image: Constants.emptyProfilePic).image)];
+  List<CardData> peopleDataList = [CardData(picture: Image(image: AssetImage(Constants.emptyProfilePicAsset)))];
   int _peopleIndex = 0;
   @override
   void initState() {
@@ -38,10 +38,10 @@ class _SwipingAreaState extends State<SwipingArea> {
 
   @override
   Widget build(BuildContext context) {
-    var _deviceWidth = MediaQuery.of(context).size.width;
+    var _swipingCardWidth = MediaQuery.of(context).size.width - Constants.edgePadding * 2;
 
 
-    return SizedBox(height:  _deviceWidth, width: _deviceWidth,
+    return SizedBox(height:  _swipingCardWidth, width: _swipingCardWidth,
       child: DraggableCard(
           personData: peopleDataList[_peopleIndex % peopleDataList.length],
           nextPersonData: peopleDataList[(_peopleIndex + 1) % peopleDataList.length],
@@ -63,8 +63,8 @@ class _SwipingAreaState extends State<SwipingArea> {
     User? currentUser = AuthenticationTools.getUser();
     UserData randomUser = await DatabaseHandler.getRandomUser(excludedUIDs: [currentUser?.uid ?? "anon"]);
 
-    var picture = FadeInImage.assetNetwork(placeholder: Constants.emptyProfilePicAsset, image: randomUser.photoURL ?? Constants.emptyProfilePic);
-    peopleDataList.add(CardData(picture: picture.image, name: randomUser.displayName));
+    var picture = FadeInImage.assetNetwork(placeholder: Constants.emptyProfilePicAsset, image: randomUser.photoURL ?? Constants.emptyProfilePic, fadeInDuration: Duration(milliseconds: 10), fadeOutDuration: Duration(milliseconds: 10),);
+    peopleDataList.add(CardData(picture: picture, name: randomUser.displayName));
     return;
   }
 }

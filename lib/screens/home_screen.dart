@@ -76,7 +76,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         currentIndex: _selectedScreen,
       ),
       body: _selectedScreen == 2 ? const ChatList() : Padding(
-        padding: const EdgeInsets.only(top: 8.0, right: 8.0, left: 8.0),
+        padding: EdgeInsets.only(top: Constants.edgePadding, right: Constants.edgePadding, left: Constants.edgePadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -91,14 +91,21 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
 
 class CustomSearchDelegate extends SearchDelegate {
-  List<String> searchTerms = [
-    'Test',
-    'ListItem',
-    'SearchResult',
-    'Bla',
-    'Test2',
-    'Test3',
-  ];
+  Future<List<UserData>> allUsers = DatabaseHandler.getAllUsers();
+  List<String> searchTerms = List<String>.empty(growable: true);
+
+  void updateSearchList() async {
+    allUsers.then(
+            (allUsers) {
+              searchTerms = List<String>.empty(growable: true);
+              for (var userData in allUsers) {
+                  if (userData.displayName != null) {
+                    searchTerms.add(userData.displayName!);
+                  }
+                }
+            }
+    );
+  }
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -122,6 +129,11 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
+    if(query.length < 1) {
+      return Container();  //DiscoverPage();
+    }
+    updateSearchList();
+
     List<String> matchQuery = [];
     for (var searchItem in searchTerms) {
       if(searchItem.toLowerCase().contains(query.toLowerCase())) {
@@ -141,21 +153,7 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var searchItem in searchTerms) {
-      if(searchItem.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(searchItem);
-      }
-    }
-    return ListView.builder(
-        itemCount: matchQuery.length,
-        itemBuilder: (context, index) {
-          var result = matchQuery[index];
-          return ListTile(
-            title: Text(result),
-          );
-        }
-    );
+    return buildResults(context);
   }
 
 }

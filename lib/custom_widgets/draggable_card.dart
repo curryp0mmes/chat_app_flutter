@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mkship_app/constants.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DraggableCard extends StatefulWidget {
@@ -19,7 +20,7 @@ class DraggableCard extends StatefulWidget {
 class CardData {
   String? name;
   int? age;
-  ImageProvider<Object> picture;
+  var picture;
   CardData({required this.picture, this.name, this.age});
 }
 
@@ -32,23 +33,29 @@ class _DraggableCardState extends State<DraggableCard> {
     return Card(
       elevation: 12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Container(
-          decoration: BoxDecoration(
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              image: DecorationImage(
-                image: data.picture,
-                fit: BoxFit.cover,
-              )
+            ),
+            child: ClipRRect(child: data.picture, borderRadius: BorderRadius.circular(10)),
           ),
-          alignment: Alignment.bottomRight,
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(data.name == null ? "" : data.name! + (data.age == null ? "" : ", "), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
-              Text(data.age == null ? "" : data.age.toString(), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
-            ],
-          )
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.bottomRight,
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(data.name == null ? "" : data.name! + (data.age == null ? "" : ", "), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
+                Text(data.age == null ? "" : data.age.toString(), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
+              ],
+            )
+          ),
+        ],
       ),
     );
   }
@@ -62,7 +69,7 @@ class _DraggableCardState extends State<DraggableCard> {
 
   @override
   Widget build(BuildContext context) {
-    var _deviceWidth = MediaQuery.of(context).size.width;
+    var _cardWidth = MediaQuery.of(context).size.width - Constants.edgePadding * 2;
     var likeThreshhold = 0.10;
 
     return Draggable(
@@ -86,7 +93,7 @@ class _DraggableCardState extends State<DraggableCard> {
         stream: _rotationStream,
         builder: (context, snapshot) {
           return Transform.rotate(angle: _rotationStream.value, filterQuality: FilterQuality.high,
-              child: Container(child: _getFullCard(person), width: _deviceWidth, height: _deviceWidth,)
+              child: Container(child: _getFullCard(person), width: _cardWidth, height: _cardWidth,)
           );
         }
       ),

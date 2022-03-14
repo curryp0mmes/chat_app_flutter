@@ -31,6 +31,16 @@ class DatabaseHandler {
     } while (excludedUIDs != null && excludedUIDs.contains(user.id));
     return await getUserData(uid: user.id);
   }
+  static Future<List<UserData>> getAllUsers() async {
+    var users = firestore.collection("users");
+    QuerySnapshot collection = await users.get();
+    List<UserData> output = List<UserData>.empty(growable: true);
+    for(int i = 0; i < collection.docs.length; i++) {
+      output.add(await getUserData(uid: collection.docs[i].id));
+    }
+
+    return output;
+  }
 
   static void updateUserValue({required String uid, required String path, required value}) {
     var userCollection = firestore.collection("users");
@@ -72,6 +82,17 @@ class DatabaseHandler {
     }
   }
 
+
+
+}
+
+class ChatData {
+  String chatID;
+  String? chatName;
+  List<Map<String, dynamic>>? messages;
+  List<UserData> members;
+
+  ChatData({required this.chatID, required this.members, this.chatName, this.messages});
 }
 
 class UserData {

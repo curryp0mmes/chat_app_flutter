@@ -90,18 +90,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
   }
 }
 
-
-
 class CustomUserSearch extends SearchDelegate {
 
-  static List<String> searchTerms = List<String>.empty(growable: true);
+  static List<UserData> searchTerms = List<UserData>.empty(growable: true);
 
   static Future<void> setupUserSearch(context) async {
     var allUsers = await DatabaseHandler.getAllUsers();
-    searchTerms = List<String>.empty(growable: true);
+    searchTerms = List<UserData>.empty(growable: true);
     for (var userData in allUsers) {
-      if (userData.displayName != null) {
-        searchTerms.add(userData.displayName!);
+      if (userData.displayName != null && userData.uid != DatabaseHandler.currentUser?.uid) {
+        searchTerms.add(userData);
       }
     }
     showSearch(context: context, delegate: CustomUserSearch(),);
@@ -136,9 +134,9 @@ class CustomUserSearch extends SearchDelegate {
       return Container();  //TODO DiscoverPage();
     }
 
-    List<String> matchQuery = [];
+    List<UserData> matchQuery = [];
     for (var searchItem in searchTerms) {
-      if(searchItem.toLowerCase().contains(query.toLowerCase())) {
+      if(searchItem.displayName!.toLowerCase().contains(query.toLowerCase())) {
         matchQuery.add(searchItem);
       }
     }
@@ -147,7 +145,11 @@ class CustomUserSearch extends SearchDelegate {
         itemBuilder: (context, index) {
           var result = matchQuery[index];
           return ListTile(
-            title: Text(result),
+            title: Text(result.displayName!),
+            trailing: IconButton(icon: const Icon(Icons.add), onPressed: () async {
+              await DatabaseHandler.createChat([DatabaseHandler.currentUser?.uid, result.uid]);
+              ChatList.buildChatList();
+            },),
           );
         }
     );

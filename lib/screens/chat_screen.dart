@@ -57,7 +57,13 @@ class _ChatWindowState extends State<ChatWindow> {
                       String timestamp;
                       try {
                         Timestamp ts = messageData?.get("timestamp");
-                        timestamp = ts.toDate().toIso8601String();
+
+                        final now = DateTime.now();
+                        final today = DateTime(now.year, now.month, now.day);
+                        final yesterday = DateTime(now.year, now.month, now.day - 1);
+
+                        final dateCheck = DateTime(ts.toDate().year, ts.toDate().month, ts.toDate().day);
+                        timestamp = '${dateCheck == yesterday? "Gestern,   ":dateCheck==today?"":'${dateCheck.day}.${dateCheck.month}.${dateCheck.year}   '}${ts.toDate().toLocal().hour}:${ts.toDate().toLocal().minute}';
                       } on StateError {
                         timestamp = "--:--";
                       }

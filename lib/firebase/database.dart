@@ -63,6 +63,15 @@ class DatabaseHandler {
     };
     firestore.collection("chats").doc(chatID).collection("messages").add(newMessage);
   }
+  
+  static Future<void> createChat(List<String?> uids) async {
+    var doc = await firestore.collection("chats").add(<String, dynamic>{"members": uids});
+    
+    for(var uid in uids) {
+      await firestore.collection("users").doc(uid).update(<String, dynamic>{"chats": FieldValue.arrayUnion([doc.id])});
+    }
+    return;
+  }
 
   static Future<UserData> getRandomUser({List<String>? excludedUIDs}) async {
     var users = firestore.collection("users");

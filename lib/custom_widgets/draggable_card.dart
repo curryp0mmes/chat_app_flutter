@@ -2,21 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mkship_app/constants.dart';
 import 'package:rxdart/rxdart.dart';
 
-class DraggableCard extends StatefulWidget {
-  CardData personData;
-  CardData nextPersonData;
-
-  DraggableScrollableController? controller;
-
-  Function onLike;
-  Function onDislike;
-
-  DraggableCard({Key? key, required this.personData,  required this.nextPersonData, required this.onLike, required this.onDislike}) : super(key: key);
-
-  @override
-  State<DraggableCard> createState() => _DraggableCardState();
-}
-
 class CardData {
   String? name;
   int? age;
@@ -24,41 +9,23 @@ class CardData {
   CardData({required this.picture, this.name, this.age});
 }
 
+class DraggableCard extends StatefulWidget {
+  CardData personData;
+
+  DraggableScrollableController? controller;
+
+  Function onLike;
+  Function onDislike;
+
+  DraggableCard({Key? key, required this.personData, required this.onLike, required this.onDislike}) : super(key: key);
+
+  @override
+  State<DraggableCard> createState() => _DraggableCardState();
+}
+
 class _DraggableCardState extends State<DraggableCard> {
   get person => widget.personData;
-  get nextPerson => widget.nextPersonData;
   BehaviorSubject<double> _rotationStream = BehaviorSubject<double>();
-
-  Card _getFullCard(CardData data) {
-    return Card(
-      elevation: 12,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ClipRRect(child: data.picture, borderRadius: BorderRadius.circular(10)),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-            ),
-            alignment: Alignment.bottomRight,
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(data.name == null ? "" : data.name! + (data.age == null ? "" : ", "), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
-                Text(data.age == null ? "" : data.age.toString(), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
-              ],
-            )
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   void initState() {
@@ -88,16 +55,62 @@ class _DraggableCardState extends State<DraggableCard> {
       },
       affinity: Axis.horizontal,
       axis: Axis.horizontal,
-      childWhenDragging: _getFullCard(nextPerson),
+      childWhenDragging: Container(),
       feedback: StreamBuilder(
         stream: _rotationStream,
         builder: (context, snapshot) {
           return Transform.rotate(angle: _rotationStream.value, filterQuality: FilterQuality.high,
-              child: Container(child: _getFullCard(person), width: _cardWidth, height: _cardWidth,)
+              child: SizedBox(child: ProfileSwipingCard(personData: person, elevation: 20,), width: _cardWidth, height: _cardWidth,)
           );
         }
       ),
-      child: _getFullCard(person),
+      child: ProfileSwipingCard(personData: person,elevation: 0,),
+    );
+  }
+}
+
+
+class ProfileSwipingCard extends StatefulWidget {
+  final CardData personData;
+  final double elevation;
+  const ProfileSwipingCard({Key? key, required this.personData, this.elevation = 12}) : super(key: key);
+
+  @override
+  State<ProfileSwipingCard> createState() => _ProfileSwipingCardState();
+}
+
+class _ProfileSwipingCardState extends State<ProfileSwipingCard> {
+  CardData get personData => widget.personData;
+  double get elevation => widget.elevation;
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: elevation,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: ClipRRect(child: personData.picture, borderRadius: BorderRadius.circular(10)),
+          ),
+          Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.bottomRight,
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(personData.name == null ? "" : personData.name! + (personData.age == null ? "" : ", "), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
+                  Text(personData.age == null ? "" : personData.age.toString(), style: TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.bold),),
+                ],
+              )
+          ),
+        ],
+      ),
     );
   }
 }

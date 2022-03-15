@@ -1,6 +1,7 @@
 import 'package:mkship_app/app_theme.dart';
 import 'package:mkship_app/firebase/authentication.dart';
 import 'package:mkship_app/firebase/database.dart';
+import 'package:mkship_app/screens/chats_list.dart';
 import 'package:mkship_app/screens/home_screen.dart';
 import 'package:mkship_app/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,17 @@ void main() async {
   );
   //Initialize Firebase Messaging Service
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true, // Required to display a heads up notification
+    badge: true,
+    sound: true,
+  );
 
   AuthenticationTools.setupAuth();
   await DatabaseHandler.setupDatabase();
+
+  //start background loading tasks
+  ChatList.buildChatList();
   runApp(const ChatApp());
 }
 

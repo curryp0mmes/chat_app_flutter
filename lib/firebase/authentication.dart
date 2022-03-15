@@ -1,4 +1,5 @@
 import 'package:mkship_app/firebase/database.dart';
+import 'package:mkship_app/screens/chats_list.dart';
 import 'package:mkship_app/screens/home_screen.dart';
 import 'package:mkship_app/screens/login_screen.dart';
 import 'package:mkship_app/main.dart';
@@ -11,6 +12,7 @@ class AuthenticationTools {
 
     auth.userChanges().listen((User? user) async {
       await DatabaseHandler.setupDatabase();
+      ChatList.buildChatList();
       if (user == null) {
         print('User is currently signed out!');
         BuildContext? context = navigatorKey.currentContext;

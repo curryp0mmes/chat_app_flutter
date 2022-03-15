@@ -25,46 +25,53 @@ class _SwipingAreaState extends State<SwipingArea> {
     super.initState();
   }
 
-  void buildInitialList() async {
-    for(int i = 0; i < 3; i++) {
-      await generateRealUser();
-      setState(() {
-        if(i==0) {
-          peopleDataList.removeAt(0);
-        }
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var _swipingCardWidth = MediaQuery.of(context).size.width - Constants.edgePadding * 2;
 
-
     return SizedBox(height:  _swipingCardWidth, width: _swipingCardWidth,
-      child: DraggableCard(
-          personData: peopleDataList[_peopleIndex % peopleDataList.length],
-          nextPersonData: peopleDataList[(_peopleIndex + 1) % peopleDataList.length],
-          onLike: () {setState(() {
-            print("Like");
-            _peopleIndex+=1;
-            if(_peopleIndex >= peopleDataList.length - 2) generateRealUser();
-          });},
-          onDislike: () {setState(() {
-            print("Dislike");
-            _peopleIndex+=1;
-            if(_peopleIndex >= peopleDataList.length - 2) generateRealUser();
-          });}
+      child: Stack(
+        children: [
+          ProfileSwipingCard(personData: peopleDataList[(_peopleIndex + 2) % peopleDataList.length], elevation: 12,), //back most element draws the elevation
+          ProfileSwipingCard(personData: peopleDataList[(_peopleIndex + 1) % peopleDataList.length], elevation: 0,),
+          DraggableCard(
+            personData: peopleDataList[_peopleIndex % peopleDataList.length],
+            onLike: () {
+              setState(() {
+                print("Like");
+                generateRealUser();
+              });
+            },
+            onDislike: () {
+              setState(() {
+                print("Dislike");
+                generateRealUser();
+              });
+            },
+          ),
+        ],
       ),
     );
   }
 
   Future<void> generateRealUser() async {
     User? currentUser = AuthenticationTools.getUser();
-    UserData randomUser = await DatabaseHandler.getRandomUser(excludedUIDs: [currentUser?.uid ?? "anon"]);
 
-    var picture = FadeInImage.assetNetwork(placeholder: Constants.emptyProfilePicAsset, image: randomUser.photoURL ?? Constants.emptyProfilePic, fadeInDuration: Duration(milliseconds: 10), fadeOutDuration: Duration(milliseconds: 10),);
-    peopleDataList.add(CardData(picture: picture, name: randomUser.displayName));
+    while(_peopleIndex > peopleDataList.length - 3) {
+      UserData randomUser = await DatabaseHandler.getRandomUser(excludedUIDs: [currentUser?.uid ?? "anon"]);
+      var picture = FadeInImage.assetNetwork(placeholder: Constants.emptyProfilePicAsset, image: randomUser.photoURL ?? Constants.emptyProfilePic, fadeInDuration: const Duration(milliseconds: 10), fadeOutDuration: const Duration(milliseconds: 10),);
+      peopleDataList.add(
+          CardData(picture: picture, name: randomUser.displayName)
+      );
+    }
+    _peopleIndex += 1;
     return;
+  }
+
+  void buildInitialList() async {
+    await generateRealUser();
+    setState(() {
+      peopleDataList.removeAt(0);
+    });
   }
 }

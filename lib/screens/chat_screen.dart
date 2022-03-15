@@ -1,20 +1,28 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mkship_app/app_theme.dart';
 import 'package:mkship_app/custom_widgets/chatblob.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mkship_app/firebase/authentication.dart';
+import 'package:mkship_app/firebase/database.dart';
 
 class ChatWindow extends StatefulWidget {
-  const ChatWindow({Key? key}) : super(key: key);
+  final String chatID;
+  final String chatName;
+
+  const ChatWindow({Key? key, required this.chatID, required this.chatName}) : super(key: key);
 
   @override
   _ChatWindowState createState() => _ChatWindowState();
 }
 
 class _ChatWindowState extends State<ChatWindow> {
+  String get chatID => widget.chatID;
+  String get chatName => widget.chatName;
 
   final _messages = {"test", "hallo", "abc", "hallowelt", "abc1", "hallowelt2", "abc3", "hallowelt4", "abc5", "hallowelt6", "abc7", "Dies ist eine sehr lange Nachricht, damit man auch mal sieht was damit passiert. Hier sind alle Nachkommastellen von PI die ich kenne: 3,14159265358979323846", "abc9", "hallowelt00", "abc11", "hallowelt22"};
 
-  TextEditingController _newMessageController = TextEditingController();
+  final TextEditingController _newMessageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +32,7 @@ class _ChatWindowState extends State<ChatWindow> {
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
         centerTitle: true,
-        title: const Text("Chats",style: TextStyle(color: Colors.black)),
+        title: Text(chatName,style: const TextStyle(color: Colors.black)),
         actions: [
           IconButton(onPressed: () {}, icon: const Icon(Icons.search, color: Colors.black,))
         ],
@@ -33,18 +41,47 @@ class _ChatWindowState extends State<ChatWindow> {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              reverse: true,
-                itemCount: _messages.length * 2 + 1,
-                itemBuilder: (context, index) {
-                  if(index.isEven) return Padding(padding: EdgeInsets.only(top: 8));
+            child: StreamBuilder<QuerySnapshot>(
+              stream: DatabaseHandler.getLiveChatMessages(chatID),
+              builder:(context, snapshot) {
+                if(!snapshot.hasData) return const Text("Loading");
+                return ListView.builder(
+                    reverse: true,
+                    itemCount: (snapshot.data?.docs.length??0) * 2 + 1,
+                    itemBuilder: (context, index) {
+                      if(index.isEven) return const Padding(padding: EdgeInsets.only(top: 8));
 
-                  final trueIndex = _messages.length - 1 - (index ~/ 2);
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                    child: ChatblobWidget(message: _messages.elementAt(trueIndex), timestamp: trueIndex.toString()+":07", right: (trueIndex % 3) != 0,),
-                  ); //TODO fix right check and timestamp
-                }
+                      final trueIndex = (snapshot.data?.docs.length??0) - 1 - (index ~/ 2);
+                      var messageData = snapshot.data?.docs[trueIndex];
+
+                      String timestamp;
+                      try {
+                        Timestamp ts = messageData?.get("timestamp");
+                        timestamp = ts.toDate().toIso8601String();
+                      } on StateError {
+                        timestamp = "--:--";
+                      }
+                      String messageText;
+                      try {
+                        messageText = messageData?.get("messageText");
+                      } on StateError {
+                        messageText = "";
+                      }
+                      bool displayRight = false;
+                      try {
+                        String senderUID = messageData?.get("from");
+                        if(senderUID == AuthenticationTools.getUser()?.uid) displayRight = true;
+                      } on StateError {
+                        displayRight = false;
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: ChatblobWidget(message: messageText, timestamp: timestamp, right: displayRight),
+                      ); //TODO fix right check and timestamp
+                    }
+                );
+              },
             ),
           ),
           Container(color: Colors.grey, height: 80, padding: EdgeInsets.all(10.0),
@@ -64,7 +101,7 @@ class _ChatWindowState extends State<ChatWindow> {
                     var message = _newMessageController.text;
                     if(message.isNotEmpty) {
                       setState(() {
-                        _messages.add(message);
+                        DatabaseHandler.sendChatMessage(chatID, message);
                         _newMessageController.text = "";
                       });
                     }

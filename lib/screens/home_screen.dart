@@ -67,7 +67,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
         onTap: (index){
           setState(() {
             if(index == 1) {
-              showSearch(context: context, delegate: CustomSearchDelegate(),);
+              CustomUserSearch.setupUserSearch(context);
             } else{
               _selectedScreen = index;
             }
@@ -75,14 +75,16 @@ class _HomePageScreenState extends State<HomePageScreen> {
         },
         currentIndex: _selectedScreen,
       ),
-      body: _selectedScreen == 2 ? const ChatList() : Padding(
-        padding: EdgeInsets.only(top: Constants.edgePadding, right: Constants.edgePadding, left: Constants.edgePadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SwipingArea(),
-          ],
-        ),
+      body: _selectedScreen == 2 ? const ChatList() : Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: Constants.edgePadding),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: Constants.edgePadding, right: Constants.edgePadding),
+            child: const SwipingArea(),
+          ),
+        ],
       ),
     );
   }
@@ -90,22 +92,23 @@ class _HomePageScreenState extends State<HomePageScreen> {
 
 
 
-class CustomSearchDelegate extends SearchDelegate {
-  Future<List<UserData>> allUsers = DatabaseHandler.getAllUsers();
-  List<String> searchTerms = List<String>.empty(growable: true);
+class CustomUserSearch extends SearchDelegate {
 
-  void updateSearchList() async {
-    allUsers.then(
-            (allUsers) {
-              searchTerms = List<String>.empty(growable: true);
-              for (var userData in allUsers) {
-                  if (userData.displayName != null) {
-                    searchTerms.add(userData.displayName!);
-                  }
-                }
-            }
-    );
+  static List<String> searchTerms = List<String>.empty(growable: true);
+
+  static Future<void> setupUserSearch(context) async {
+    var allUsers = await DatabaseHandler.getAllUsers();
+    searchTerms = List<String>.empty(growable: true);
+    for (var userData in allUsers) {
+      if (userData.displayName != null) {
+        searchTerms.add(userData.displayName!);
+      }
+    }
+    showSearch(context: context, delegate: CustomUserSearch(),);
   }
+
+
+
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -129,10 +132,9 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    if(query.length < 1) {
-      return Container();  //DiscoverPage();
+    if(query.length < 2) {
+      return Container();  //TODO DiscoverPage();
     }
-    updateSearchList();
 
     List<String> matchQuery = [];
     for (var searchItem in searchTerms) {

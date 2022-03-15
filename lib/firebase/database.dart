@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:mkship_app/firebase/authentication.dart';
@@ -18,6 +19,49 @@ class DatabaseHandler {
 
 
     return UserData(uid: uid ?? "anon", email: email, displayName: displayName, photoURL: photoURL);
+  }
+
+  static Future<List<String>> getUserChats({required String? uid}) async {
+    var userData = await firestore.collection("users").doc(uid ?? "anon").get();
+    var chats;
+    try {
+      chats = userData.get("chats");
+    } on StateError {
+      return List<String>.empty();
+    }
+    List<String> chatids = (chats as List<dynamic>).cast<String>();
+    return chatids;
+  }
+
+  static Future<Map<String, dynamic>> getChatInfo(String chatid) async {
+    var chatData = await firestore.collection("chats").doc(chatid).get();
+    if(chatData.data() == null) return jsonDecode('{"error":"nodata"}');
+
+    Map<String, dynamic> chatJSON = chatData.data()!;
+    if(chatJSON["members"] != null) {
+      List<dynamic> uids = chatJSON["members"] as List<dynamic>;
+      for(int i = 0; i < uids.length; i++) {
+        var userData = await firestore.collection("users").doc(uids[i]).get();
+        Map<String, dynamic> user = userData.data()!;
+        user.update("uid", (value) => uids[i], ifAbsent: () => uids[i]);
+        uids[i] = user;
+      }
+    }
+    return chatJSON;
+  }
+
+  static dynamic getLiveChatMessages(String chatID) {
+    var chat = firestore.collection("chats").doc(chatID).collection("messages").orderBy("timestamp").snapshots();
+    return chat;
+  }
+
+  static void sendChatMessage(String chatID, String message) {
+    var newMessage = <String, dynamic>{
+      "messageText": message,
+      "from": AuthenticationTools.getUser()?.uid,
+      "timestamp": Timestamp.now()
+    };
+    firestore.collection("chats").doc(chatID).collection("messages").add(newMessage);
   }
 
   static Future<UserData> getRandomUser({List<String>? excludedUIDs}) async {
